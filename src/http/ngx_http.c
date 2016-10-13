@@ -120,6 +120,8 @@ ngx_module_t  ngx_http_module = {
     NGX_MODULE_V1_PADDING
 };
 
+#define DUMP_MAX_BUF 65536
+static unsigned char dump_buffer[DUMP_MAX_BUF];
 
 static char *
 ngx_http_block(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
@@ -1474,6 +1476,9 @@ ngx_http_optimize_servers(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf,
          * configuration as a default server for given address:port
          */
 
+        if (ngx_dump_config) {
+            fprintf(stdout, "\n");
+        }
         addr = port[p].addrs.elts;
         for (a = 0; a < port[p].addrs.nelts; a++) {
 
@@ -1508,6 +1513,7 @@ ngx_http_server_names(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf,
     ngx_hash_keys_arrays_t      ha;
     ngx_http_server_name_t     *name;
     ngx_http_core_srv_conf_t  **cscfp;
+    ngx_int_t                   is_ssl;
 #if (NGX_PCRE)
     ngx_uint_t                  regex, i;
 
@@ -1530,10 +1536,32 @@ ngx_http_server_names(ngx_conf_t *cf, ngx_http_core_main_conf_t *cmcf,
     cscfp = addr->servers.elts;
 
     for (s = 0; s < addr->servers.nelts; s++) {
+        if (ngx_dump_config) {
+            if (s >0) { fprintf(stdout, "\n"); }
+            memset(dump_buffer,0,DUMP_MAX_BUF);
+            ngx_snprintf(dump_buffer, DUMP_MAX_BUF -1 , "# dump_config port: %s ", addr->opt.addr);
+            fprintf(stdout, "%s", dump_buffer);
+            is_ssl = 0;
+#if (NGX_HTTP_SSL)
+            if (addr->opt.ssl > 0) {  is_ssl = 1 ; }
+#endif
+            if (is_ssl == 1) {  fprintf(stdout, "ssl "); } else {  fprintf(stdout, "nossl "); }
+
+        }
 
         name = cscfp[s]->server_names.elts;
 
         for (n = 0; n < cscfp[s]->server_names.nelts; n++) {
+            if (ngx_dump_config) {
+                if (n >0) { fprintf(stdout, ","); }
+                ngx_snprintf(dump_buffer, DUMP_MAX_BUF -1 , "%V",&name[n].name);
+                if ( name[n].name.len < DUMP_MAX_BUF ) {
+                    dump_buffer[name[n].name.len] = 0;
+                } else {
+                    dump_buffer[DUMP_MAX_BUF - 1] = 0;
+                }
+                fprintf(stdout, "%s", dump_buffer);
+            }
 
 #if (NGX_PCRE)
             if (name[n].regex) {
