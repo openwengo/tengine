@@ -1,2 +1,4 @@
 Makefile
 objs/
+do_configure.sh
+git-author-rewrite.sh
