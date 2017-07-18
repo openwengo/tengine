@@ -592,7 +592,7 @@ ngx_http_perl_create_interpreter(ngx_conf_t *cf,
         }
     }
 
-    embedding[n++] = "-Mnginx";
+    embedding[n++] = "-Mtengine";
     embedding[n++] = "-e";
     embedding[n++] = "0";
 
@@ -603,7 +603,7 @@ ngx_http_perl_create_interpreter(ngx_conf_t *cf,
         goto fail;
     }
 
-    sv = get_sv("nginx::VERSION", FALSE);
+    sv = get_sv("tengine::VERSION", FALSE);
     ver = SvPV(sv, len);
 
     if (ngx_strcmp(ver, NGINX_VERSION) != 0) {

@@ -21,12 +21,12 @@ $NGX_OBJS/src/http/modules/perl/Makefile: \\
 		$NGX_AUTO_CONFIG_H \\
 		src/core/nginx.h \\
 		src/http/modules/perl/Makefile.PL \\
-		src/http/modules/perl/nginx.pm \\
-		src/http/modules/perl/nginx.xs \\
+		src/http/modules/perl/tengine.pm \\
+		src/http/modules/perl/tengine.xs \\
 		src/http/modules/perl/typemap
-	sed "s/%%VERSION%%/$v/" src/http/modules/perl/nginx.pm > \\
-		$NGX_OBJS/src/http/modules/perl/nginx.pm
-	cp -p src/http/modules/perl/nginx.xs $NGX_OBJS/src/http/modules/perl/
+	sed "s/%%VERSION%%/$v/" src/http/modules/perl/tengine.pm > \\
+		$NGX_OBJS/src/http/modules/perl/tengine.pm
+	cp -p src/http/modules/perl/tengine.xs $NGX_OBJS/src/http/modules/perl/
 	cp -p src/http/modules/perl/typemap $NGX_OBJS/src/http/modules/perl/
 	cp -p src/http/modules/perl/Makefile.PL $NGX_OBJS/src/http/modules/perl/
 

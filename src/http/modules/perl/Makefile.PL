@@ -6,11 +6,11 @@ use 5.006001;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    NAME              => 'nginx',
-    VERSION_FROM      => 'nginx.pm',     # finds $VERSION
+    NAME              => 'tengine',
+    VERSION_FROM      => 'tengine.pm',     # finds $VERSION
     PREREQ_PM         => {},             # e.g., Module::Name => 1.1
 
-    ABSTRACT_FROM     => 'nginx.pm',     # retrieve abstract from module
+    ABSTRACT_FROM     => 'tengine.pm',     # retrieve abstract from module
     AUTHOR            => 'Igor Sysoev',
 
     CCFLAGS           => "$ENV{NGX_PM_CFLAGS}",
@@ -28,6 +28,6 @@ WriteMakefile(
     },
 
     PM => {
-        'nginx.pm'    => '$(INST_LIBDIR)/nginx.pm'
+        'tengine.pm'    => '$(INST_LIBDIR)/tengine.pm'
     }
 );

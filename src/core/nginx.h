@@ -11,7 +11,7 @@
 
 #define nginx_version      1006002
 #define NGINX_VERSION      "1.6.2"
-#define NGINX_VER          "nginx/" NGINX_VERSION
+#define NGINX_VER          "tengine/" NGINX_VERSION
 
 #define TENGINE            "Tengine"
 #define tengine_version    2001002
