@@ -15,6 +15,7 @@ static ngx_int_t ngx_conf_handler(ngx_conf_t *cf, ngx_int_t last);
 static ngx_int_t ngx_conf_read_token(ngx_conf_t *cf);
 static void ngx_conf_flush_files(ngx_cycle_t *cycle);
 
+//static char dump_conf_buff[NGX_CONF_BUFFER+1] ;
 
 static ngx_command_t  ngx_conf_commands[] = {
 
@@ -511,6 +512,11 @@ ngx_conf_read_token(ngx_conf_t *cf)
     ngx_str_t   *word;
     ngx_buf_t   *b, *dump;
 
+    static int dump_ident_level = 0;
+    static int dump_needs_newline = 0;
+    int dump_ident_idx = 0;
+
+
     found = 0;
     need_space = 0;
     last_space = 1;
@@ -611,6 +617,27 @@ ngx_conf_read_token(ngx_conf_t *cf)
         }
 
         ch = *b->pos++;
+        if (ngx_dump_config) {
+            if (ch == LF) {
+               dump_needs_newline = 1;
+            }
+            if (dump_needs_newline) {
+               fprintf(stdout, "\n");
+               dump_needs_newline = 0;
+               for ( dump_ident_idx = 0; dump_ident_idx < dump_ident_level; dump_ident_idx++) {
+                  fprintf(stdout, "  ");
+               }
+            }
+            if (( ch != LF ) && ( ch != CR )) {
+               if (last_space && !sharp_comment ) {
+                  if (!(ch == ' ' || ch == '\t' || ch == CR || ch == LF)) {
+                      fprintf(stdout, "%c", ch);
+                  }
+               } else {
+                 fprintf(stdout, "%c", ch);
+               }
+            }
+        }
 
         if (ch == LF) {
             cf->conf_file->line++;
@@ -637,10 +664,13 @@ ngx_conf_read_token(ngx_conf_t *cf)
             }
 
             if (ch == ';') {
+                dump_needs_newline = 1;
                 return NGX_OK;
             }
 
             if (ch == '{') {
+                dump_needs_newline = 1;
+                dump_ident_level += 1;
                 return NGX_CONF_BLOCK_START;
             }
 
@@ -675,6 +705,8 @@ ngx_conf_read_token(ngx_conf_t *cf)
                 }
 
                 if (ch == '{') {
+                    dump_needs_newline = 1;
+                    dump_ident_level += 1;
                     return NGX_CONF_BLOCK_START;
                 }
 
@@ -687,6 +719,8 @@ ngx_conf_read_token(ngx_conf_t *cf)
                     return NGX_ERROR;
                 }
 
+                dump_needs_newline = 1;
+                dump_ident_level -= 1;
                 return NGX_CONF_BLOCK_DONE;
 
             case '#':
@@ -803,10 +837,14 @@ ngx_conf_read_token(ngx_conf_t *cf)
                 word->len = len;
 
                 if (ch == ';') {
+                    dump_needs_newline = 1;
+                    dump_ident_level += 0;
                     return NGX_OK;
                 }
 
                 if (ch == '{') {
+                    dump_needs_newline = 1;
+                    dump_ident_level += 1;
                     return NGX_CONF_BLOCK_START;
                 }
 
